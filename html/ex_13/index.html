@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Create User</title>
+    </head>
+    <body>
+        <h1>Create User</h1>
+        <hr>
+        <form action="create_user.html" method="GET" enctype="application/x-www-form-urlencoded">
+            
+                
+                <label for="name">Username: </label>
+                <input type="text" name="name"  placeholder="name" size="30" maxlength="12"><br>         
+                
+                <label for="Move">Movile List: </label>
+                <select name="movie">
+                    <option value="">Please select a movie</option>
+                    <option value="batman_vs_superman">Batman v Superman</option>
+                    <option value="civil_war">Captain America: Civil War</option>
+                    <option value="doctor_strange">Doctor Strange</option>
+                    <option value="wonder_woman" selected>Wonder Woman</option>
+                    <option value="black_panther">Black Panther</option>
+                  </select> <br>
+                
+                  <label for="bio">Bio: </label><br>
+                  <textarea name="bio" placeholder="Please write the bio of yourself" cols="40" rows="5" ></textarea><br>
+
+                  <label for="filename">Upload a avatar image: </label><br>
+                  <input type="file" name="filename" /> <br>
+                
+                  <label for="clear-form">Clear Form </label>
+                  <button value="clear" name="clear-form">Clear Form</button>
+                  <label for="add-user">Add new user </label>
+                  <button value="add" name="add-user">Add new user</button>
+
+
+
+                
+
+           
+        
+        </form>
+        <a href="../index.html">Main Page</a>
+
+        
+    </body>
+</html>
