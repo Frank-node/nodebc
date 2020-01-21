@@ -1,3 +1,3 @@
-# My-first-site Project
+# HTML Exercises
 
-This project includes some exercises for learning HTML
+This directory includes the exercises for learning HTML

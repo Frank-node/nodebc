@@ -1,3 +1,3 @@
-# New Project
+# CSS Exercises
 
-This project it's to learn HTML, CSS, JS, Node.js and MongoDB
+This directory includes the exercises for learning CSS
