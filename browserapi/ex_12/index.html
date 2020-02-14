@@ -19,7 +19,10 @@
   
   <script>
     let totalLeftSeconds = 0;
-    totalLeftSeconds = prompt('Please input the number of seconds that you would like to stay in our site');
+    do {
+      totalLeftSeconds = prompt('Please input the number of seconds that you would like to stay in our site');
+    } while(isNaN(totalLeftSeconds))
+    
     let minutesLabel = document.getElementById("minutes");
     let secondsLabel = document.getElementById("seconds");
     let leftMinutesLabel = document.getElementById("leftminutes");
