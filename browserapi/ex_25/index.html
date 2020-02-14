@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>It's all JavaScript Baby!!</title>
+  </head>
+  <body>
+
+
+    <script>
+      const title = document.createElement('h1');
+      const paragraph = document.createElement('p');
+      
+      title.innerText = 'Create Dynamic content!!!';
+      paragraph.innerText = 'This elements were created using JavaScript';
+
+      document.body.appendChild(title);
+      document.body.appendChild(paragraph);   
+
+      const fruits = ["Banana", "Orange", "Apple", "Mango","Strawberry"];
+      const ulist = document.createElement('ul')
+      fruits.forEach((value)=>{
+        let item = document.createElement('li');
+        item.innerText = value;
+        ulist.appendChild(item);
+
+      })
+      document.body.appendChild(ulist);
+      
+    </script>
+  </body>
+</html>
