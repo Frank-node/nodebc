@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Texts</title>
+</head>
+<body>
+  <h1>Main Title</h1>
+  <p>This is a paragraph</p>
+  <ul></ul>
+
+  <script>
+    const h1Elem = document.querySelector('h1');
+    let h1Text = h1Elem.innerHTML;
+    const pElem = document.querySelector('p');
+    let pText = pElem.innerText;
+    console.log("h1 text: " + h1Text);
+    console.log("p text: " + pText);
+    h1Elem.innerHTML = pText;
+    pElem.innerText = h1Text;
+    const ulElem = document.querySelector('ul');
+    ulElem.innerHTML = '<li>Item 1</li><li>Item 2</li><li>Item 3</li><li>Item 4</li><li>Item 5</li>';
+    const children = ulElem.children;
+    console.log(children);
+    console.log(ulElem.innerHTML);
+    h1Elem.style.color = 'red';
+    h1Elem.style.fontFamily = 'normal';
+    h1Elem.style.textDecoration = 'underline';
+    pElem.style.color = 'green';
+    pElem.style.fontFamily= 'bold';
+    pElem.style.border = '1px solid black';
+    ulElem.style.color = 'purple';
+    ulElem.style.fontStyle = 'italic';
+  </script>
+</body>
+</html>
