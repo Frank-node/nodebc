@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>It's all JavaScript Baby!!</title>
+  </head>
+  <body>
+
+
+    <script>
+      let username = '';
+      let count = 0;
+      username = prompt('Please input username: ')
+      console.log(username);
+      const ulist = document.createElement('ul')
+      document.body.appendChild(ulist);
+      while(username!=null){
+        count++;
+        let item = document.createElement('li');
+        item.innerText = username;
+        if(count%2 === 0 )
+          item.style.color = '#ddd000';
+        else
+          item.style.color = '#00eeee';
+        ulist.appendChild(item);       
+        username = prompt('Please input username: ')
+      }    
+      
+      
+      
+    </script>
+  </body>
+</html>

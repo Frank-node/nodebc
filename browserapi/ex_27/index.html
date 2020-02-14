@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>It's all JavaScript Baby!!</title>
+  </head>
+  <body>
+
+
+    <script>
+      let numbers = [];
+      for(let i=1;i<=100;i++){
+        numbers.push(i);
+      }
+      console.log(numbers);
+      
+      const ulist = document.createElement('ul')
+      numbers.forEach((value)=>{
+        let item = document.createElement('li');
+        item.innerText = value;
+        if(value%2 === 0 )
+          item.style.color = '#dd00dd';
+        else
+          item.style.color = '#00eeee';
+        ulist.appendChild(item);
+
+      })
+      document.body.appendChild(ulist);
+      
+    </script>
+  </body>
+</html>
