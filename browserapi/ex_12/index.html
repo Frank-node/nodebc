@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <div style="font-size: 24px;">
+    Log in time: 
+    <label id="minutes">00</label>:<label id="seconds">00</label>
+    <br>
+    Time left: 
+    <label id="leftminutes">00</label>:<label id="leftseconds">00</label>
+  </div>
+  
+
+  
+  <script>
+    let totalLeftSeconds = 0;
+    totalLeftSeconds = prompt('Please input the number of seconds that you would like to stay in our site');
+    let minutesLabel = document.getElementById("minutes");
+    let secondsLabel = document.getElementById("seconds");
+    let leftMinutesLabel = document.getElementById("leftminutes");
+    let leftSecondsLabel = document.getElementById("leftseconds");
+    let totalSeconds = 0;
+    console.log(totalLeftSeconds);
+
+    function pad ( val ) { return val > 9 ? val : "0" + val; }
+    function setTime(){
+        ++totalSeconds;
+        --totalLeftSeconds;
+        console.log(totalSeconds);
+        secondsLabel.innerHTML = pad(totalSeconds % 60);
+        minutesLabel.innerHTML = pad(parseInt(totalSeconds / 60));
+        leftSecondsLabel.innerHTML = pad(totalLeftSeconds % 60);
+        leftMinutesLabel.innerHTML = pad(parseInt(totalLeftSeconds / 60));
+        if(totalLeftSeconds ===0 ) {
+          alert('Your session has expired, come again soon!');
+          clearInterval(id);
+        }
+    }
+    const id = setInterval(setTime, 1000);
+    
+
+</script>
+</body>
+</html>
