@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Timer</title>
+  <script>
+    
+    let username = window.prompt('Please input your user name');
+    let password = prompt('Please input your password');
+
+    alert(`Welcome ${username}`);
+
+    function greeting(name, nickname){
+      alert(`Hi ${name} ${nickname} have been in this site for 5 seconds`);
+    }
+
+    setTimeout(greeting,5000,'Frank','Gu');//function should be passed as the value without parentheses
+    setTimeout(greeting('Frank','Gu'),5000);//It doesn't work
+
+    function logon(){
+      if(confirm('Do you still want to be logged?'))
+        alert(`${username} your session has been restored`);
+      else
+        alert(`${username} your session has expaired`);
+    }
+    setTimeout(logon,10000);
+    //setTimeout(()=>{alert('You have been in this site for 5 seconds')},5000);
+    //setTimeout(alert('You have been in this site for 5 seconds'),5000);//It doesn't work
+  </script>
+</head>
+<body>
+ 
+  <script>
+    
+
+
+  </script>
+
+</body>
+</html>
