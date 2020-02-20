@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Browser API Ex_5</title>
+    <script>
+      
+      let result = 0;
+      let count = 0;
+      let numArray =[];
+      let input = prompt('Please input a number: ');
+      
+      while(input!=null) {        
+        let number = Number(input);
+        if(!isNaN(input)&&number!=0){          
+          numArray.push(number);
+          console.log(numArray);
+          result += number;
+          //count ++;
+          //alert(`The result so far is: ${result}.`);
+          
+        }         
+        input = prompt('Please input a number: ');
+      }
+      count = numArray.length
+      let average = result/count;
+      alert(`The final result  is: ${result}. \n The user input ${count} numbers\n The average is: ${average}`);
+      
+      
+  </script>
+</head>
+<body>
+  
+</body>
+</html>
