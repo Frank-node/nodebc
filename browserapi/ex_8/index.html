@@ -17,7 +17,7 @@
         if(!isNaN(input)&&number!=0){          
           numArray.push(number);
           console.log(numArray);
-          result += number;
+          //result += number;
           //count ++;
           //alert(`The result so far is: ${result}.`);
           
@@ -25,6 +25,10 @@
         input = prompt('Please input a number: ');
       }
       count = numArray.length
+      function getSum(total,num){
+        return total + num;
+      }
+      result = numArray.reduce(getSum,0);
       let average = result/count;
       alert(`The final result  is: ${result}. \n The user input ${count} numbers\n The average is: ${average}`);
       
