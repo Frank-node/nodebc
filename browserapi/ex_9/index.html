@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Go to the new  URL</title>
+  <script>
+    //location = 'https://www.winnipegfreepress.com/sports/hockey/jets/white-magic-480439263.html#go-jets-go';
+    let newURL = prompt("Please input a complete url: ");
+    // console.log(location.href);     // https://www.winnipegfreepress.com/sports/hockey/jets/white-magic-480439263.html#go-jets-go
+    // console.log(location.protocol); // https:
+    // console.log(location.host);     // www.winnipegfreepress.com 
+    // console.log(location.hostname); // www.winnipegfreepress.com
+    // console.log(location.port);     // empty string as it doesn't have a port number
+    // console.log(location.pathname); // /sports/hockey/jets/white-magic-480439263.html
+    // console.log(location.search);   // empty string as we don't have a query string params (you can try this submiting a form using GET)
+    // console.log(location.hash);     // #go-jets-go
+    if(newURL.includes('http://'))
+      location.href = newURL;
+    
+    else 
+      location.href = "http://" + newURL; 
+    
+  </script>
+</head>
+<body>
+  
+  
+</body>
+</html>
