@@ -1,0 +1,1 @@
+console.log("Welcome to JavaScript and Node.js server side");var person={name:"John Rambo",age:33,address:"170 Richards st"};console.log(person.name);console.log(person.age);console.log(person.address);
