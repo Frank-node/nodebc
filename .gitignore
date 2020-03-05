@@ -2,6 +2,9 @@
 # dependencies  npm package files
 **/node_modules
 
+# upload files
+**/upload
+
 # production package files
 **/build
 
