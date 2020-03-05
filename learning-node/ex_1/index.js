@@ -32,15 +32,23 @@ numArray.forEach(
     }
 );
 
-const callBack = () => {
-    console.log('This code gets executed after the greet function call');
-}
-const greet = (firstname, lastname, callBack) =>{
-    console.log(`Hi ${firstname} ${lastname}`);
-    callBack();
-
+const message = () => {
+    console.log('We\'re using node modules yeah!!!');
 }
 
-greet('Frank','Gu',callBack);
+const greeter = require('./greeter');
+
+greeter.greet('Frank','Gu',()=>{console.log('We\'re using node modules yeah!!!')});
+greeter.printMessage();
+
+try {
+    greeter.greet('Frank', 'Gu', 'sssss');  
+} catch (error) {
+    console.log('We have an error:', error);
+}
+finally{
+    console.log('I\'ll run, your like it or not')
+}
+
 
 
