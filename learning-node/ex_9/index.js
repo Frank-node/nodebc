@@ -87,15 +87,29 @@ app.post('/postuser', urlencodedParser, (req, res) => {
 
 //Use multer Module to handle the files uploaded
 const multer  = require('multer');
-const upload = multer({ dest: 'upload' });
+//const upload = multer({ dest: 'upload' });
+// SET STORAGE
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, 'upload')
+  },
+  filename: function (req, file, cb) {
+      cb(null, file.fieldname + '-' + Date.now() + '-' + file.originalname)
+  }
+})
+const upload = multer({ storage: storage });
+app.use('/upload', express.static('upload'));
 
 app.post('/upload', upload.single('file'), (req, res) => {
   const filename = req.file.originalname;
+  const filePath = req.file.path;
   
   console.log(req.body);
   console.log(req.file);
   
-  res.send(`Congrats we uploaded the following file ${filename}`);
+  res.send(`User Information: ${req.body.username},${req.body.firstname},${req.body.lastname}
+  Congrats we uploaded the following file ${filename}
+  img: <img src=${filePath} />`);
 });
 
 //GET joke: show 1 jokes
