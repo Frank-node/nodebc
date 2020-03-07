@@ -1,0 +1,13 @@
+extends ./layout.pug
+
+block content
+  h1 Superheroes
+  p This site shows superheroes information
+  include ./create.pug
+  each superhero in superheroes
+    div.superhero-container
+      a(href="/superheroes/" + superhero.id)
+        img(src='/img/superheroes/' + superhero.image, width='300px') 
+        h3= superhero.name
+
+
