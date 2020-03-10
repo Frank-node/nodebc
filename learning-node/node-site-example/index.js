@@ -8,7 +8,33 @@ app.use(express.static('public'))
 //Set the pug template engine
 app.set('view engine', 'pug');
 
-// configure the port that express is going to listen to
+//Set the mongoose to connect mongodb
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/superherodb');
+
+//Setup the superhero schema
+const supheroSchema = new mongoose.Schema({
+  name: String,
+  image: String
+});
+
+const Superhero = mongoose.model("Superhero",supheroSchema);
+
+// Superhero.create(
+//   {
+//     name: 'CAPTAIN MARVEL',
+//     image: 'captainmarvel.jpg'
+//   },
+//   function(err, superhero){
+//     if(err){
+//       console.log(err);
+//     } else {
+//       console.log("Newly created superhero");
+//       console.log(superhero);
+//     }
+//   });
+
+// configure the port that expressis going to listen to
 const port = 3000;
 app.listen(port, (err) => {  
   if (err) {
@@ -20,18 +46,20 @@ app.listen(port, (err) => {
 // app.get('/', (req, res) => {
 //   res.render('index', {});
 // });
-const superheroes = [
-  { id: 1, name: 'SPIDER-MAN', image: 'spiderman.jpg' },
-  { id: 2, name: 'CAPTAIN MARVEL', image: 'captainmarvel.jpg' },
-  { id: 3, name: 'HULK', image: 'hulk.jpg' },
-  { id: 4, name: 'THOR', image: 'thor.jpg' },
-  { id: 5, name: 'IRON MAN', image: 'ironman.jpg' },
-  { id: 6, name: 'DAREDEVIL', image: 'daredevil.jpg' },
-  { id: 7, name: 'BLACK WIDOW', image: 'blackwidow.jpg' },
-  { id: 8, name: 'CAPTAIN AMERICA', image: 'captanamerica.jpg' },
-  { id: 9, name: 'WOLVERINE', image: 'wolverine.jpg' },
-  { id: 10, name: 'LUKE CAGE', image: 'lukecage.jpg' },
-];
+// const superheroes = [
+//   { id: 1, name: 'SPIDER-MAN', image: 'spiderman.jpg' },
+//   { id: 2, name: 'CAPTAIN MARVEL', image: 'captainmarvel.jpg' },
+//   { id: 3, name: 'HULK', image: 'hulk.jpg' },
+//   { id: 4, name: 'THOR', image: 'thor.jpg' },
+//   { id: 5, name: 'IRON MAN', image: 'ironman.jpg' },
+//   { id: 6, name: 'DAREDEVIL', image: 'daredevil.jpg' },
+//   { id: 7, name: 'BLACK WIDOW', image: 'blackwidow.jpg' },
+//   { id: 8, name: 'CAPTAIN AMERICA', image: 'captanamerica.jpg' },
+//   { id: 9, name: 'WOLVERINE', image: 'wolverine.jpg' },
+//   { id: 10, name: 'LUKE CAGE', image: 'lukecage.jpg' },
+//   { id: 11, name: 'BATMAN', image: 'file-1583548086696Batman.jpg' },
+//   { id: 12, name: 'ANT MAN', image: 'file-1583553186723Ant-Man.png' }
+// ];
 
 //Use multer Module to handle the files uploaded
 const multer  = require('multer');
@@ -50,9 +78,18 @@ var storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 
-//the router for home page
+//Set the router for home page
 app.get('/', (req, res) => {
-  res.render('index', { superheroes: superheroes });
+  //Get all superheroes from mongodb
+  Superhero.find({},function(err, allSuperheroes){
+    if(err){
+      console.log(err);
+    } else {
+      res.render('index', { superheroes: allSuperheroes });
+      console.log(allSuperheroes);
+    }
+  })
+  //res.render('index', { superheroes: superheroes });
 });
 
 
@@ -62,34 +99,50 @@ app.get('/', (req, res) => {
 
 //the router for the detail of superhero page
 app.get('/superheroes/:id', (req, res) => {
-  const selectedId = req.params.id;
+  //const selectedId = req.params.id;
+  Superhero.findById(req.params.id, function(err, foundSuperhero){
+    if(err){
+      console.log(err);
+    } else {
+      res.render('superhero', { superhero: foundSuperhero });
+      console.log(foundSuperhero);
+    }
+  })
+  // let selectedSuperhero = superheroes.filter(superhero => {
+  //   return superhero.id === +selectedId;
+  // });
 
-  let selectedSuperhero = superheroes.filter(superhero => {
-    return superhero.id === +selectedId;
-  });
-
-  selectedSuperhero = selectedSuperhero[0];
+  // selectedSuperhero = selectedSuperhero[0];
   
-  res.render('superhero', { superhero: selectedSuperhero });
+  // res.render('superhero', { superhero: selectedSuperhero });
 });
 
 //Add body-parser as middleware
 const bodyParser = require('body-parser');
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
+//Create a new superhero
 app.post('/superheros', upload.single('file'), (req, res) => {
-  const newId = superheroes[superheroes.length - 1].id + 1;
+  //const newId = superheroes[superheroes.length - 1].id + 1;
   console.log('body',req.body);
   console.log('file',req.file);
-  const newSuperHero = {
-    id: newId, 
+  const newSuperhero = {
+    //id: newId, 
     name: req.body.superhero.toUpperCase(), 
     image: req.file.filename
   }
+  Superhero.create(newSuperhero,   function(err, newlyCreated){
+    if(err){
+      console.log(err);
+    } else {
+      console.log("Newly created superhero");
+      res.redirect('/'); //redirect back to the homepage
+      console.log(newlyCreated);
+    }
+  });
   
-  superheroes.push(newSuperHero);
-  
-  res.redirect('/');
+  //superheroes.push(newSuperhero);  
+  //res.redirect('/');
 });
 
 
