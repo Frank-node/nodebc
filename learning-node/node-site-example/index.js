@@ -12,11 +12,11 @@ app.set('view engine', 'pug');
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/superherodb');
 
-//Setup the superhero schema
+//Setup the superhero schema, default collection name is superheros
 const supheroSchema = new mongoose.Schema({
   name: String,
   image: String
-});
+}, { collection: 'superheroes' }); //Set a different name for your collection
 
 const Superhero = mongoose.model("Superhero",supheroSchema);
 
@@ -59,7 +59,7 @@ app.listen(port, (err) => {
 //   { id: 10, name: 'LUKE CAGE', image: 'lukecage.jpg' },
 //   { id: 11, name: 'BATMAN', image: 'file-1583548086696Batman.jpg' },
 //   { id: 12, name: 'ANT MAN', image: 'file-1583553186723Ant-Man.png' }
-// ];
+//];
 
 //Use multer Module to handle the files uploaded
 const multer  = require('multer');
@@ -97,9 +97,24 @@ app.get('/', (req, res) => {
 //   res.render('superhero', { superheroes: superheroes });
 // });
 
+app.get('/create', (req, res) => {
+  res.render('create');
+});
+
 //the router for the detail of superhero page
 app.get('/superheroes/:id', (req, res) => {
-  //const selectedId = req.params.id;
+  // const selectedId = req.params.id;
+  // //the usage of filter() method of Array
+  // // let selectedSuperhero = superheroes.filter(superhero => {
+  // //   //+selectedId: convert string to number, as Number(selectedId)
+  // //   return superhero.id === +selectedId;
+  // // });
+  // //selectedSuperhero = selectedSuperhero[0]; 
+  // //the usage find() method of Array 
+  // let selectedSuperhero = superheroes.find( superhero => superhero.id === +selectedId );
+  // console.log(selectedSuperhero);
+  // res.render('superhero', { superhero: selectedSuperhero });
+
   Superhero.findById(req.params.id, function(err, foundSuperhero){
     if(err){
       console.log(err);
@@ -108,13 +123,7 @@ app.get('/superheroes/:id', (req, res) => {
       console.log(foundSuperhero);
     }
   })
-  // let selectedSuperhero = superheroes.filter(superhero => {
-  //   return superhero.id === +selectedId;
-  // });
-
-  // selectedSuperhero = selectedSuperhero[0];
   
-  // res.render('superhero', { superhero: selectedSuperhero });
 });
 
 //Add body-parser as middleware
