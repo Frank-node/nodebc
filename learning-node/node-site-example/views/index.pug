@@ -12,6 +12,8 @@ block content
             div(class="card-body")
                 h5(class="card-title")= superhero.name
                 p(class="card-text")= superhero.name
+                a(href="/delete/" + superhero.id class="btn btn-danger") Delete
+                a(href="/update/" + superhero.id class="btn btn-info") Update
         //-img(src='/img/superheroes/' + superhero.image  width='200px') 
         //-h3= superhero.name
 

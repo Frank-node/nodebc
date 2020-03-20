@@ -3,7 +3,8 @@ const express = require('express');
 const app = express();
 
 //Serving static files in Express
-app.use(express.static('public'))
+app.use(express.static('public'));
+
 
 //Set the pug template engine
 app.set('view engine', 'pug');
@@ -85,6 +86,7 @@ app.get('/', (req, res) => {
     if(err){
       console.log(err);
     } else {
+      allSuperheroes.reverse();
       res.render('index', { superheroes: allSuperheroes });
       console.log(allSuperheroes);
     }
@@ -126,6 +128,35 @@ app.get('/superheroes/:id', (req, res) => {
   
 });
 
+//Include File System module
+const fs = require('fs');
+
+//Set the route to delete a superhero 
+app.get('/delete/:id', (req, res) => {
+    Superhero.findByIdAndRemove(req.params.id, function(err, deletedSuperhero){
+    if(err){
+      res.redirect('/'); 
+    } else {
+      
+      console.log(deletedSuperhero);
+      const deletedFilename = __dirname + "/public/img/superheroes/"+ deletedSuperhero.image;
+      console.log(deletedFilename);
+      //fs.unlinkSync(deletedFilename);  // delete file synchronously
+      
+      // delete file asynchronously
+      if(fs.existsSync(deletedFilename)){
+        fs.unlink(deletedFilename, (err) => {
+          if (err) throw err;
+          console.log('successfully deleted images from folder superheroes');
+        });
+      }
+      res.redirect('/'); 
+    } 
+  })
+  
+});
+
+
 //Add body-parser as middleware
 const bodyParser = require('body-parser');
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
@@ -154,5 +185,103 @@ app.post('/superheros', upload.single('file'), (req, res) => {
   //res.redirect('/');
 });
 
+//update view
+app.get('/update/:id', (req, res) => {
+  //internal scope of this function
+  // MongoClient.connect(url, function (err, client) {
+  //     const db = client.db('comics');
+  //     const collection = db.collection('superheroes');
+  //     const selectedId = req.params.id;
+
+  //     collection.find({ "_id": ObjectID(selectedId) }).toArray((error, documents) => {
+  //         client.close();
+  //         res.render('update', { superheroe: documents[0] });
+  //     });
+  // });
+
+  Superhero.findById(req.params.id, function(err, foundSuperhero){
+    if(err){
+      console.log(err);
+    } else {
+      res.render('update', { superhero: foundSuperhero });
+      console.log(foundSuperhero);
+    }
+  })
+
+});
+
+//Update method superheroeUpdate
+app.post('/superheroUpdate/:id', upload.single('file'), (req, res) => {
+
+  const newSuperhero = {
+    name: req.body.superhero.toUpperCase(), 
+    image: req.file.filename
+  }
+
+  if (req.file){
+      console.log("Updating image");
+      newSuperhero.image = req.file.filename;
+  }
+
+  Superhero.findByIdAndUpdate(req.params.id, {$set: newSuperhero}, function(err, originalSuperhero){
+    if(err){
+      res.redirect('/'); 
+    } else {
+      
+      console.log(originalSuperhero);
+      const deletedFilename = __dirname + "/public/img/superheroes/"+ originalSuperhero.image;
+      console.log(deletedFilename);
+      //fs.unlinkSync(deletedFilename);  // delete file synchronously
+      
+      // delete file asynchronously
+      if(fs.existsSync(deletedFilename)){
+        fs.unlink(deletedFilename, (err) => {
+          if (err) throw err;
+          console.log('successfully deleted images from folder superheroes');
+        });
+      }
+      res.redirect('/'); 
+    } 
+  })
+
+
+
+
+  // MongoClient.connect(url, function (err, client) {
+  //     const db = client.db('comics');
+  //     const collection = db.collection('superheroes');
+  //     const selectedId = req.params.id;
+
+  //     //Delete the old hero image
+  //     collection.find({ "_id": ObjectID(selectedId) }).toArray((error, documents) => {
+  //       fs.unlink(__dirname + "/public/img/superheroes/" + documents[0].image, (err) => {
+  //           if (err) throw err;
+  //           console.log('successfully deleted images from folder superheroes');
+  //       });
+  //     });
+  //     //from command line we update an object collection with the following syntax
+  //     //db.superheroes.updateOne({"name":"ANT MAN"}, { $set: { "name":"ANT MAN 1"} })
+
+  //     let filter = { "_id": ObjectID(selectedId) };
+
+  //     let updateObject = {
+  //         "name": req.body.superhero.toUpperCase(),
+  //     }
+
+  //     if (req.file){
+  //         console.log("Updating image");
+  //         updateObject.image = req.file.filename;
+  //     }
+      
+  //     let update = {
+  //         $set: updateObject
+  //     };
+
+  //     collection.updateOne(filter, update);
+
+  //     client.close();
+  //     res.redirect('/');
+  // });
+});
 
 
