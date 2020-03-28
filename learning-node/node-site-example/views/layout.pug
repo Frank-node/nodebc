@@ -18,12 +18,16 @@ html(lang='en')
             a.nav-link(href='/')
               | Home 
               span.sr-only (current)
-          li.nav-item
-            a.nav-link(href='#') Login
-          li.nav-item
-            a.nav-link(href='#') Sign Up
-          li.nav-item
-            a.nav-link(href='#') Logout          
+          if !currentUser
+            li.nav-item
+              a.nav-link(href='/login') Login
+            li.nav-item
+              a.nav-link(href='/register') Sign Up
+          else
+            li.nav-item
+              a.nav-link(href='/#') Signed In As #{currentUser.username}
+            li.nav-item
+              a.nav-link(href='/logout') Logout          
     div(class="jumbotron")
       h1 Superheroes
       p This site shows superheroes information

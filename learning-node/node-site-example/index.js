@@ -2,6 +2,38 @@
 const express = require('express');
 const app = express();
 
+//Require the data model
+const Superhero = require('./models/superhero');
+const Comment = require('./models/comment');
+const User = require('./models/user');
+
+//Add body-parser as middleware
+const bodyParser = require('body-parser');
+const urlencodedParser = bodyParser.urlencoded({ extended: true });
+app.use(urlencodedParser);
+
+//PASSPORT CONFIGURATION
+const passport    = require("passport");
+const LocalStrategy = require("passport-local");
+app.use(require("express-session")({
+  secret: "Once again Rusty wins cutest dog!",
+  resave: false,
+  saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+app.use(function(req, res, next){
+  res.locals.currentUser = req.user;
+  next();
+});
+
+
+
+
 //Serving static files in Express
 app.use(express.static('public'));
 
@@ -14,8 +46,7 @@ const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/superherodb');
 //mongoose.connect('mongodb+srv://nodetest:dbTestbc@cluster0-3osxf.mongodb.net/superherodb?retryWrites=true&w=majority');
 
-const Superhero = require('./models/superhero');
-const Comment = require('./models/comment')
+
 //Setup the superhero schema, default collection name is superheros
 // const supheroSchema = new mongoose.Schema({
 //   name: String,
@@ -84,9 +115,13 @@ var storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage });
 
+//Set the route for home page
+app.get("/", function(req, res){
+  res.render("landing");
+});
 
-//Set the router for home page
-app.get('/', (req, res) => {
+//Set the router for the list of superheroes page
+app.get('/superheroes', (req, res) => {
   //Get all superheroes from mongodb
   Superhero.find({},function(err, allSuperheroes){
     if(err){
@@ -162,12 +197,6 @@ app.get('/delete/:id', (req, res) => {
   
 });
 
-
-//Add body-parser as middleware
-const bodyParser = require('body-parser');
-const urlencodedParser = bodyParser.urlencoded({ extended: true });
-app.use(urlencodedParser);
-
 //Create a new superhero
 app.post('/superheros', upload.single('file'), (req, res) => {
   //const newId = superheroes[superheroes.length - 1].id + 1;
@@ -217,7 +246,7 @@ app.get('/update/:id', (req, res) => {
 
 });
 
-//Update method superheroeUpdate
+//Update method for superhero
 app.post('/superheroUpdate/:id', upload.single('file'), (req, res) => {
 
   const newSuperhero = {
@@ -295,7 +324,7 @@ app.post('/superheroUpdate/:id', upload.single('file'), (req, res) => {
 // COMMENTS ROUTES
 // ====================
 
-app.get("/superheroes/:id/comments/new", function(req, res){
+app.get("/superheroes/:id/comments/new", isLoggedIn, function(req, res){
   // find campground by id
   Superhero.findById(req.params.id, function(err, foundSuperhero){
       if(err){
@@ -306,7 +335,7 @@ app.get("/superheroes/:id/comments/new", function(req, res){
   })
 });
 
-app.post("/superheroes/:id/comments", function(req, res){
+app.post("/superheroes/:id/comments", isLoggedIn, function(req, res){
   //lookup superhero using ID
   Superhero.findById(req.params.id, function(err, superhero){
       if(err){
@@ -328,3 +357,51 @@ app.post("/superheroes/:id/comments", function(req, res){
   //connect new comment to campground
   //redirect campground show page
 });
+
+
+//  ===========
+// AUTH ROUTES
+//  ===========
+
+// show register form
+app.get("/register", function(req, res){
+  res.render("register"); 
+});
+//handle sign up logic
+app.post("/register", function(req, res){
+   var newUser = new User({username: req.body.username});
+   User.register(newUser, req.body.password, function(err, user){
+       if(err){
+           console.log(err);
+           return res.render("register");
+       }
+       passport.authenticate("local")(req, res, function(){
+          res.redirect("/superheroes"); 
+       });
+   });
+});
+
+// show login form
+app.get("/login", function(req, res){
+  res.render("login"); 
+});
+// handling login logic
+app.post("/login", passport.authenticate("local", 
+   {
+       successRedirect: "/superheroes",
+       failureRedirect: "/login"
+   }), function(req, res){
+});
+
+// logic route
+app.get("/logout", function(req, res){
+  req.logout();
+  res.redirect("/superheroes");
+});
+
+function isLoggedIn(req, res, next){
+   if(req.isAuthenticated()){
+       return next();
+   }
+   res.redirect("/login");
+}
