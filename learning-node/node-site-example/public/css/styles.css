@@ -38,5 +38,13 @@ body {
 }
 
 .card img {
-  width: 200px;
+  width: 100%;
+}
+
+.card {
+  padding: 0;
+}
+
+.card .caption-full {
+  padding: 9px;
 }

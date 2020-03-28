@@ -12,14 +12,17 @@ app.set('view engine', 'pug');
 //Set the mongoose to connect mongodb
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/superherodb');
+//mongoose.connect('mongodb+srv://nodetest:dbTestbc@cluster0-3osxf.mongodb.net/superherodb?retryWrites=true&w=majority');
 
+const Superhero = require('./models/superhero');
+const Comment = require('./models/comment')
 //Setup the superhero schema, default collection name is superheros
-const supheroSchema = new mongoose.Schema({
-  name: String,
-  image: String
-}, { collection: 'superheroes' }); //Set a different name for your collection
+// const supheroSchema = new mongoose.Schema({
+//   name: String,
+//   image: String
+// }, { collection: 'superheroes' }); //Set a different name for your collection
 
-const Superhero = mongoose.model("Superhero",supheroSchema);
+// const Superhero = mongoose.model("Superhero",supheroSchema);
 
 // Superhero.create(
 //   {
@@ -35,8 +38,11 @@ const Superhero = mongoose.model("Superhero",supheroSchema);
 //     }
 //   });
 
+// use port 3000 unless there exists a preconfigured port
+const port = process.env.PORT || 3000;
+
 // configure the port that expressis going to listen to
-const port = 3000;
+
 app.listen(port, (err) => {  
   if (err) {
     return console.log(`Unable to start the server on port ${port}`, err);
@@ -117,7 +123,7 @@ app.get('/superheroes/:id', (req, res) => {
   // console.log(selectedSuperhero);
   // res.render('superhero', { superhero: selectedSuperhero });
 
-  Superhero.findById(req.params.id, function(err, foundSuperhero){
+  Superhero.findById(req.params.id).populate("comments").exec(function(err, foundSuperhero){
     if(err){
       console.log(err);
     } else {
@@ -159,7 +165,8 @@ app.get('/delete/:id', (req, res) => {
 
 //Add body-parser as middleware
 const bodyParser = require('body-parser');
-const urlencodedParser = bodyParser.urlencoded({ extended: false });
+const urlencodedParser = bodyParser.urlencoded({ extended: true });
+app.use(urlencodedParser);
 
 //Create a new superhero
 app.post('/superheros', upload.single('file'), (req, res) => {
@@ -284,4 +291,40 @@ app.post('/superheroUpdate/:id', upload.single('file'), (req, res) => {
   // });
 });
 
+// ====================
+// COMMENTS ROUTES
+// ====================
 
+app.get("/superheroes/:id/comments/new", function(req, res){
+  // find campground by id
+  Superhero.findById(req.params.id, function(err, foundSuperhero){
+      if(err){
+          console.log(err);
+      } else {
+           res.render("newcomment", {superhero: foundSuperhero});
+      }
+  })
+});
+
+app.post("/superheroes/:id/comments", function(req, res){
+  //lookup superhero using ID
+  Superhero.findById(req.params.id, function(err, superhero){
+      if(err){
+          console.log(err);
+          res.redirect("/");
+      } else {
+       Comment.create(req.body.comment, function(err, comment){
+          if(err){
+              console.log(err);
+          } else {
+              superhero.comments.push(comment);
+              superhero.save();
+              res.redirect('/superheroes/' + superhero.id);
+          }
+       });
+      }
+  });
+  //create new comment
+  //connect new comment to campground
+  //redirect campground show page
+});
