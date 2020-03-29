@@ -17,6 +17,8 @@ block content
           h4
             a= superhero.name
           p= superhero.name
+          p
+            em Submitted By #{superhero.author.username}
       br
       .card.bg-light
         .text-right
@@ -25,7 +27,7 @@ block content
         each comment in superhero.comments
           .row
             .col-md-12
-              strong= comment.author
+              strong= comment.author.username
               span.float-right 10 days ago
               p #{comment.text}
 
@@ -46,7 +48,7 @@ block content
   //-         | - #{comment.text}
 
 block bottomNavigation
-  a(href="javascript:history.back()" class="btn btn-link") Go back
+  a(href="/superheroes" class="btn btn-link") Go back
 
 block footer
   div(style="background-color: red")=superhero.name

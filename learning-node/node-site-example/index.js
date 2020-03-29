@@ -12,6 +12,11 @@ const bodyParser = require('body-parser');
 const urlencodedParser = bodyParser.urlencoded({ extended: true });
 app.use(urlencodedParser);
 
+//requring routes
+const commentRoutes    = require("./routes/comments"),
+    superheroRoutes = require("./routes/superheroes"),
+    indexRoutes      = require("./routes/index");
+
 //PASSPORT CONFIGURATION
 const passport    = require("passport");
 const LocalStrategy = require("passport-local");
@@ -31,10 +36,14 @@ app.use(function(req, res, next){
   next();
 });
 
+// override with POST having ?_method=DELETE and ?_method=PUT
+const methodOverride = require('method-override');
+app.use(methodOverride('_method'));
+//Configure it to look at GET requests, but this is a really bad idea
+//app.use(methodOverride('_method', { methods: ['POST', 'GET'] }));
 
 
-
-//Serving static files in Express
+//Serving static files in Expres)
 app.use(express.static('public'));
 
 
@@ -69,6 +78,10 @@ mongoose.connect('mongodb://localhost/superherodb');
 //     }
 //   });
 
+app.use("/", indexRoutes);
+app.use("/superheroes", superheroRoutes);
+app.use("/superheroes/:id/comments", commentRoutes);
+
 // use port 3000 unless there exists a preconfigured port
 const port = process.env.PORT || 3000;
 
@@ -99,309 +112,14 @@ app.listen(port, (err) => {
 //   { id: 12, name: 'ANT MAN', image: 'file-1583553186723Ant-Man.png' }
 //];
 
-//Use multer Module to handle the files uploaded
-const multer  = require('multer');
-//const upload = multer({ dest: 'upload' });
-// SET STORAGE
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-      cb(null, 'public/img/superheroes')
-  },
-  filename: function (req, file, cb) {
-      //const extension = file.originalname.split('.').pop(); 
-      console.log(file);
-      cb(null, file.fieldname + '-' + Date.now() + file.originalname);
-  }
-})
-const upload = multer({ storage: storage });
-
-//Set the route for home page
-app.get("/", function(req, res){
-  res.render("landing");
-});
-
-//Set the router for the list of superheroes page
-app.get('/superheroes', (req, res) => {
-  //Get all superheroes from mongodb
-  Superhero.find({},function(err, allSuperheroes){
-    if(err){
-      console.log(err);
-    } else {
-      allSuperheroes.reverse();
-      res.render('index', { superheroes: allSuperheroes });
-      console.log(allSuperheroes);
-    }
-  })
-  //res.render('index', { superheroes: superheroes });
-});
-
-
-// app.get('/superheroes/', (req, res) => {
-//   res.render('superhero', { superheroes: superheroes });
-// });
-
-app.get('/create', (req, res) => {
-  res.render('create');
-});
-
-//the router for the detail of superhero page
-app.get('/superheroes/:id', (req, res) => {
-  // const selectedId = req.params.id;
-  // //the usage of filter() method of Array
-  // // let selectedSuperhero = superheroes.filter(superhero => {
-  // //   //+selectedId: convert string to number, as Number(selectedId)
-  // //   return superhero.id === +selectedId;
-  // // });
-  // //selectedSuperhero = selectedSuperhero[0]; 
-  // //the usage find() method of Array 
-  // let selectedSuperhero = superheroes.find( superhero => superhero.id === +selectedId );
-  // console.log(selectedSuperhero);
-  // res.render('superhero', { superhero: selectedSuperhero });
-
-  Superhero.findById(req.params.id).populate("comments").exec(function(err, foundSuperhero){
-    if(err){
-      console.log(err);
-    } else {
-      res.render('superhero', { superhero: foundSuperhero });
-      console.log(foundSuperhero);
-    }
-  })
-  
-});
-
-//Include File System module
-const fs = require('fs');
-
-//Set the route to delete a superhero 
-app.get('/delete/:id', (req, res) => {
-    Superhero.findByIdAndRemove(req.params.id, function(err, deletedSuperhero){
-    if(err){
-      res.redirect('/'); 
-    } else {
-      
-      console.log(deletedSuperhero);
-      const deletedFilename = __dirname + "/public/img/superheroes/"+ deletedSuperhero.image;
-      console.log(deletedFilename);
-      //fs.unlinkSync(deletedFilename);  // delete file synchronously
-      
-      // delete file asynchronously
-      if(fs.existsSync(deletedFilename)){
-        fs.unlink(deletedFilename, (err) => {
-          if (err) throw err;
-          console.log('successfully deleted images from folder superheroes');
-        });
-      }
-      res.redirect('/'); 
-    } 
-  })
-  
-});
-
-//Create a new superhero
-app.post('/superheros', upload.single('file'), (req, res) => {
-  //const newId = superheroes[superheroes.length - 1].id + 1;
-  console.log('body',req.body);
-  console.log('file',req.file);
-  const newSuperhero = {
-    //id: newId, 
-    name: req.body.superhero.toUpperCase(), 
-    image: req.file.filename
-  }
-  Superhero.create(newSuperhero,   function(err, newlyCreated){
-    if(err){
-      console.log(err);
-    } else {
-      console.log("Newly created superhero");
-      res.redirect('/'); //redirect back to the homepage
-      console.log(newlyCreated);
-    }
-  });
-  
-  //superheroes.push(newSuperhero);  
-  //res.redirect('/');
-});
-
-//update view
-app.get('/update/:id', (req, res) => {
-  //internal scope of this function
-  // MongoClient.connect(url, function (err, client) {
-  //     const db = client.db('comics');
-  //     const collection = db.collection('superheroes');
-  //     const selectedId = req.params.id;
-
-  //     collection.find({ "_id": ObjectID(selectedId) }).toArray((error, documents) => {
-  //         client.close();
-  //         res.render('update', { superheroe: documents[0] });
-  //     });
-  // });
-
-  Superhero.findById(req.params.id, function(err, foundSuperhero){
-    if(err){
-      console.log(err);
-    } else {
-      res.render('update', { superhero: foundSuperhero });
-      console.log(foundSuperhero);
-    }
-  })
-
-});
-
-//Update method for superhero
-app.post('/superheroUpdate/:id', upload.single('file'), (req, res) => {
-
-  const newSuperhero = {
-    name: req.body.superhero.toUpperCase(), 
-    image: req.file.filename
-  }
-
-  if (req.file){
-      console.log("Updating image");
-      newSuperhero.image = req.file.filename;
-  }
-
-  Superhero.findByIdAndUpdate(req.params.id, {$set: newSuperhero}, function(err, originalSuperhero){
-    if(err){
-      res.redirect('/'); 
-    } else {
-      
-      console.log(originalSuperhero);
-      const deletedFilename = __dirname + "/public/img/superheroes/"+ originalSuperhero.image;
-      console.log(deletedFilename);
-      //fs.unlinkSync(deletedFilename);  // delete file synchronously
-      
-      // delete file asynchronously
-      if(fs.existsSync(deletedFilename)){
-        fs.unlink(deletedFilename, (err) => {
-          if (err) throw err;
-          console.log('successfully deleted images from folder superheroes');
-        });
-      }
-      res.redirect('/'); 
-    } 
-  })
 
 
 
 
-  // MongoClient.connect(url, function (err, client) {
-  //     const db = client.db('comics');
-  //     const collection = db.collection('superheroes');
-  //     const selectedId = req.params.id;
-
-  //     //Delete the old hero image
-  //     collection.find({ "_id": ObjectID(selectedId) }).toArray((error, documents) => {
-  //       fs.unlink(__dirname + "/public/img/superheroes/" + documents[0].image, (err) => {
-  //           if (err) throw err;
-  //           console.log('successfully deleted images from folder superheroes');
-  //       });
-  //     });
-  //     //from command line we update an object collection with the following syntax
-  //     //db.superheroes.updateOne({"name":"ANT MAN"}, { $set: { "name":"ANT MAN 1"} })
-
-  //     let filter = { "_id": ObjectID(selectedId) };
-
-  //     let updateObject = {
-  //         "name": req.body.superhero.toUpperCase(),
-  //     }
-
-  //     if (req.file){
-  //         console.log("Updating image");
-  //         updateObject.image = req.file.filename;
-  //     }
-      
-  //     let update = {
-  //         $set: updateObject
-  //     };
-
-  //     collection.updateOne(filter, update);
-
-  //     client.close();
-  //     res.redirect('/');
-  // });
-});
-
-// ====================
-// COMMENTS ROUTES
-// ====================
-
-app.get("/superheroes/:id/comments/new", isLoggedIn, function(req, res){
-  // find campground by id
-  Superhero.findById(req.params.id, function(err, foundSuperhero){
-      if(err){
-          console.log(err);
-      } else {
-           res.render("newcomment", {superhero: foundSuperhero});
-      }
-  })
-});
-
-app.post("/superheroes/:id/comments", isLoggedIn, function(req, res){
-  //lookup superhero using ID
-  Superhero.findById(req.params.id, function(err, superhero){
-      if(err){
-          console.log(err);
-          res.redirect("/");
-      } else {
-       Comment.create(req.body.comment, function(err, comment){
-          if(err){
-              console.log(err);
-          } else {
-              superhero.comments.push(comment);
-              superhero.save();
-              res.redirect('/superheroes/' + superhero.id);
-          }
-       });
-      }
-  });
-  //create new comment
-  //connect new comment to campground
-  //redirect campground show page
-});
 
 
-//  ===========
-// AUTH ROUTES
-//  ===========
 
-// show register form
-app.get("/register", function(req, res){
-  res.render("register"); 
-});
-//handle sign up logic
-app.post("/register", function(req, res){
-   var newUser = new User({username: req.body.username});
-   User.register(newUser, req.body.password, function(err, user){
-       if(err){
-           console.log(err);
-           return res.render("register");
-       }
-       passport.authenticate("local")(req, res, function(){
-          res.redirect("/superheroes"); 
-       });
-   });
-});
 
-// show login form
-app.get("/login", function(req, res){
-  res.render("login"); 
-});
-// handling login logic
-app.post("/login", passport.authenticate("local", 
-   {
-       successRedirect: "/superheroes",
-       failureRedirect: "/login"
-   }), function(req, res){
-});
 
-// logic route
-app.get("/logout", function(req, res){
-  req.logout();
-  res.redirect("/superheroes");
-});
 
-function isLoggedIn(req, res, next){
-   if(req.isAuthenticated()){
-       return next();
-   }
-   res.redirect("/login");
-}
+

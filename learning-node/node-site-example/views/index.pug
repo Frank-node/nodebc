@@ -1,7 +1,7 @@
 extends ./layout.pug
 
 block content
-  a(href="/create" class="btn btn-primary") Create
+  a(href="/superheroes/new" class="btn btn-primary") Create
   hr
   .row.text-center(style='display:flex; flex-wrap: wrap;')
     div(class="card-group")
@@ -13,8 +13,11 @@ block content
               div(class="card-body")
                   h5(class="card-title")= superhero.name
                   p(class="card-text")= superhero.name
-                  a(href="/delete/" + superhero.id class="btn btn-danger") Delete
-                  a(href="/update/" + superhero.id class="btn btn-info") Update
+                  .row.justify-content-center
+                    form#delete(action="/superheroes/" + superhero.id + "?_method=DELETE" method='POST')
+                      button.btn.btn-danger Delete
+                    //- a(href="/superheroes/" + superhero.id + "?_method=DELETE" class="btn btn-danger") Delete
+                    a(href="/superheroes/" + superhero.id + "/update" class="btn btn-info") Update
           //-img(src='/img/superheroes/' + superhero.image  width='200px') 
           //-h3= superhero.name
 

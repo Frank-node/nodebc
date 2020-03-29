@@ -3,7 +3,7 @@ extends ./layout.pug
 block content
   h1 Update view
   p This is a form that you can use to update a superhero
-  form(action="/superheroUpdate/" + superhero.id method="post" enctype="multipart/form-data")
+  form(action="/superheroes/" + superhero.id + "?_method=PUT" method="post" enctype="multipart/form-data")
       input(type="file" placeholder="superhero picture" name="file")
       input(type="text" value=superhero.name placeholder="superhero name" required="required" name="superhero")
       button Update

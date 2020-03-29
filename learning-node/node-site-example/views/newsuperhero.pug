@@ -2,7 +2,7 @@ extends ./layout.pug
 
 block content
   div.create-container
-    form(action="/superheros",  method="post", enctype="multipart/form-data")
+    form(action="/superheroes",  method="post", enctype="multipart/form-data")
       input(type="text" placeholder="suerhero name" required="required" name="superhero")
       input(type="file" name="file" placeholder="suerhero picture" accept="image/*" required="required")
       button Create
