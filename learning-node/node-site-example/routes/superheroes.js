@@ -1,6 +1,7 @@
 var express = require("express");
 var router  = express.Router();
 var Superhero = require("../models/superhero");
+var middleware = require("../middleware");
 
 //Use multer Module to handle the files uploaded
 const multer  = require('multer');
@@ -32,12 +33,12 @@ router.get('/', (req, res) => {
       allSuperheroes.reverse();
       res.render('index', { superheroes: allSuperheroes });
       console.log(allSuperheroes);
-    }
+     }
   })
   //res.render('index', { superheroes: superheroes });
 });
 
-router.get('/new', isLoggedIn,(req, res) => {
+router.get('/new', middleware.isLoggedIn,(req, res) => {
   res.render('newsuperhero');
 });
 
@@ -70,13 +71,40 @@ router.get('/:id', (req, res) => {
 const fs = require('fs');
 
 //Set the route to delete a superhero 
-router.delete('/:id', (req, res) => {
-    Superhero.findByIdAndRemove(req.params.id, function(err, deletedSuperhero){
-    if(err){
-      res.redirect('/superheroes'); 
-    } else {
+// router.delete('/:id', (req, res) => {
+//     Superhero.findOneAndRemove({'_id' : req.params.id}, function(err, deletedSuperhero){
+//     if(err){
+//       res.redirect('/superheroes'); 
+//     } else {
       
-      console.log(deletedSuperhero);
+//       console.log(deletedSuperhero);
+//       const deletedFilename = __dirname + "/public/img/superheroes/"+ deletedSuperhero.image;
+//       console.log(deletedFilename);
+//       //fs.unlinkSync(deletedFilename);  // delete file synchronously
+      
+//       // delete file asynchronously
+//       if(fs.existsSync(deletedFilename)){
+//         fs.unlink(deletedFilename, (err) => {
+//           if (err) throw err;
+//           console.log('successfully deleted images from folder superheroes');
+//         });
+//       }
+//       res.redirect('/superheroes');
+//       // Comment.deleteMany( {_id: { $in: deletedSuperhero.comments } }, (err) => {
+//       //   if (err) {
+//       //       console.log(err);
+//       //   }
+//       //   res.redirect('/superheroes'); 
+//       // }); 
+//     }
+//   })
+// });
+
+router.delete("/:id", middleware.checkSuperheroOwnership, async(req,res)=>{
+  try {
+    let deletedSuperhero = await Superhero.findById(req.params.id);
+    await deletedSuperhero.remove();
+    console.log(deletedSuperhero);
       const deletedFilename = __dirname + "/public/img/superheroes/"+ deletedSuperhero.image;
       console.log(deletedFilename);
       //fs.unlinkSync(deletedFilename);  // delete file synchronously
@@ -88,14 +116,29 @@ router.delete('/:id', (req, res) => {
           console.log('successfully deleted images from folder superheroes');
         });
       }
-      res.redirect('/superheroes'); 
-    } 
-  })
-  
+    res.redirect("/superheroes");
+  } catch (error) {
+    res.redirect("/superheroes");
+  }
 });
 
+
+// router.delete("/:id", checkCampgroundOwnership, (req, res) => {
+//   Campground.findByIdAndRemove(req.params.id, (err, campgroundRemoved) => {
+//       if (err) {
+//           console.log(err);
+//       }
+//       Comment.deleteMany( {_id: { $in: campgroundRemoved.comments } }, (err) => {
+//           if (err) {
+//               console.log(err);
+//           }
+//           res.redirect("/campgrounds");
+//       });
+//   })
+// });
+
 //Create a new superhero
-router.post('/', isLoggedIn, upload.single('file'), (req, res) => {
+router.post('/', middleware.isLoggedIn, upload.single('file'), (req, res) => {
   //const newId = superheroes[superheroes.length - 1].id + 1;
   console.log('body',req.body);
   console.log('file',req.file);
@@ -123,8 +166,8 @@ router.post('/', isLoggedIn, upload.single('file'), (req, res) => {
   //res.redirect('/');
 });
 
-//update view
-router.get('/:id/update', (req, res) => {
+//edit view
+router.get('/:id/edit', middleware.checkSuperheroOwnership, (req, res) => {
   //internal scope of this function
   // MongoClient.connect(url, function (err, client) {
   //     const db = client.db('comics');
@@ -136,20 +179,20 @@ router.get('/:id/update', (req, res) => {
   //         res.render('update', { superheroe: documents[0] });
   //     });
   // });
-
+  
   Superhero.findById(req.params.id, function(err, foundSuperhero){
     if(err){
       console.log(err);
     } else {
-      res.render('update', { superhero: foundSuperhero });
+      res.render('edit', { superhero: foundSuperhero });
       console.log(foundSuperhero);
     }
   })
 
 });
 
-//Update method for superhero
-router.put('/:id', upload.single('file'), (req, res) => {
+//Update superhero
+router.put('/:id', middleware.checkSuperheroOwnership, upload.single('file'), (req, res) => {
 
   const newSuperhero = {
     name: req.body.superhero.toUpperCase(), 
@@ -178,7 +221,7 @@ router.put('/:id', upload.single('file'), (req, res) => {
           console.log('successfully deleted images from folder superheroes');
         });
       }
-      res.redirect('/superheroes'); 
+      res.redirect('/superheroes/'+ req.params.id); 
     } 
   })
 
@@ -223,11 +266,11 @@ router.put('/:id', upload.single('file'), (req, res) => {
 });
 
 //middleware
-function isLoggedIn(req, res, next){
-  if(req.isAuthenticated()){
-      return next();
-  }
-  res.redirect("/login");
-}
+// function isLoggedIn(req, res, next){
+//   if(req.isAuthenticated()){
+//       return next();
+//   }
+//   res.redirect("/login");
+// }
 
 module.exports = router;

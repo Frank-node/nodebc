@@ -2,6 +2,10 @@
 const express = require('express');
 const app = express();
 
+//Display the message
+const flash = require('connect-flash');
+app.use(flash());
+
 //Require the data model
 const Superhero = require('./models/superhero');
 const Comment = require('./models/comment');
@@ -11,6 +15,7 @@ const User = require('./models/user');
 const bodyParser = require('body-parser');
 const urlencodedParser = bodyParser.urlencoded({ extended: true });
 app.use(urlencodedParser);
+
 
 //requring routes
 const commentRoutes    = require("./routes/comments"),
@@ -33,8 +38,11 @@ passport.deserializeUser(User.deserializeUser());
 
 app.use(function(req, res, next){
   res.locals.currentUser = req.user;
+  res.locals.error = req.flash("error");
+  res.locals.success = req.flash("success");
   next();
 });
+
 
 // override with POST having ?_method=DELETE and ?_method=PUT
 const methodOverride = require('method-override');

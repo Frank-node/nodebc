@@ -19,6 +19,10 @@ block content
           p= superhero.name
           p
             em Submitted By #{superhero.author.username}
+          if(currentUser && superhero.author.id.equals(currentUser.id))
+            a(href="/superheroes/" + superhero.id + "/edit" class="btn btn-warning btn-xs") Edit
+            form#delete-form(action="/superheroes/" + superhero.id + "?_method=DELETE" method='POST')
+              button.btn.btn-danger.btn-xs Delete
       br
       .card.bg-light
         .text-right

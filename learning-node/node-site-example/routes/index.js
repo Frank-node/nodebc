@@ -21,11 +21,14 @@ router.post("/register", function(req, res){
    var newUser = new User({username: req.body.username});
    User.register(newUser, req.body.password, function(err, user){
        if(err){
-           console.log(err);
-           return res.render("register");
+          req.flash("error", err.message);
+          if(err.message && err.message.length > 0)
+            console.log(err.message);
+          return res.render("register");
        }
        passport.authenticate("local")(req, res, function(){
-          res.redirect("/superheroes"); 
+        req.flash("success", "Welcome to Marvel " + user.username);
+        res.redirect("/superheroes"); 
        });
    });
 });
@@ -45,6 +48,7 @@ router.post("/login", passport.authenticate("local",
 // logic route
 router.get("/logout", function(req, res){
   req.logout();
+  req.flash("success", "Logged you out!");
   res.redirect("/superheroes");
 });
 

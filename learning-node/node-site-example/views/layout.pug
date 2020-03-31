@@ -27,7 +27,12 @@ html(lang='en')
             li.nav-item
               a.nav-link(href='/#') Signed In As #{currentUser.username}
             li.nav-item
-              a.nav-link(href='/logout') Logout          
+              a.nav-link(href='/logout') Logout    
+    .container
+      if(error && error.length > 0)
+        .alert.alert-danger(role='alert')= error
+      if(success && success.length > 0)
+        .alert.alert-success(role='alert')= success      
     div(class="jumbotron")
       h1 Superheroes
       p This site shows superheroes information
